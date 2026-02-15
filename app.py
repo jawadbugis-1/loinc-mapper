@@ -11,7 +11,15 @@ if not DATABASE_URL:
     st.error("DATABASE_URL is missing. Please set it in environment variables.")
     st.stop()
 
-engine = create_engine(DATABASE_URL)
+db_url = DATABASE_URL
+
+# Render يعطي DATABASE_URL بصيغة postgresql://
+# SQLAlchemy مع psycopg3 يحتاج postgresql+psycopg://
+if db_url.startswith("postgresql://"):
+    db_url = db_url.replace("postgresql://", "postgresql+psycopg://", 1)
+
+engine = create_engine(db_url, pool_pre_ping=True)
+
 
 def loinc_search(query: str, limit: int = 10):
     """بحث سريع داخل جدول loinc_terms بالاسم الطويل."""

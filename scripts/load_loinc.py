@@ -9,7 +9,12 @@ TABLE_NAME = os.environ.get("LOINC_TABLE", "loinc_terms")
 if not DATABASE_URL:
     raise RuntimeError("DATABASE_URL is missing. Set it as an environment variable.")
 
-engine = create_engine(DATABASE_URL)
+db_url = DATABASE_URL
+if db_url.startswith("postgresql://"):
+    db_url = db_url.replace("postgresql://", "postgresql+psycopg://", 1)
+
+engine = create_engine(db_url)
+
 
 def main():
     # 1) قراءة جزء صغير لمعرفة الأعمدة
